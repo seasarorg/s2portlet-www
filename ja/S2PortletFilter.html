@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- don't edit start -->
+<head>
+<title>Seasar - DI Container with AOP - </title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link href="seasar_b.css" type="text/css" rel="stylesheet" media="screen">
+<link href="seasar_p.css" type="text/css" rel="stylesheet" media="print">
+<script src="seasar_b.js" type="text/JavaScript" language="JavaScript"></script>
+</head><body onload="preload('ja')"><table width="100%" border="0" cellspacing="0" cellpadding="0" align="left"><tr>
+<td align="left" valign="top" width="780"><table width="780" border="0" cellspacing="0" cellpadding="0" class="white">
+<tr><td colspan="7"><img height="5" width="780" src="images/top01_b.gif" alt=""></td></tr>
+<tr><td><img height="117" width="235" src="images/top02_b.gif" alt="Seasar"></td>
+<td colspan="3"><img height="117" width="289" src="images/top03.gif" alt="DI Container with AOP"></td>
+<td colspan="3"><img height="117" width="256" src="images/spacer.gif" alt=""></td>
+</tr><tr><td rowspan="2"><img src="images/top04.gif" alt="" height="49" width="235"></td>
+<td><a href="http://www.seasar.org/index.html"><img src="images/menu01_b_ja.gif" height="30" width="78" border="0" alt="" id="menu01" onmouseover="swap(1)" onmouseout="restore(1)"></a></td>
+<td><a href="http://www.seasar.org/projects.html"><img src="images/menu02_b_ja.gif" height="30" width="101" border="0" alt="" id="menu02" onmouseover="swap(2)" onmouseout="restore(2)"></a></td>
+<td><a href="http://www.seasar.org/products.html"><img src="images/menu03_b_ja.gif" height="30" width="110" border="0" alt="" id="menu03" onmouseover="swap(3)" onmouseout="restore(3)"></a></td>
+<td><a href="http://www.seasar.org/resources.html"><img src="images/menu04_b_ja.gif" height="30" width="113" border="0" alt="" id="menu04" onmouseover="swap(4)" onmouseout="restore(4)"></a></td>
+<td><img src="images/menu05_b_ja.gif" height="30" width="109" border="0" alt="" id="menu05" onmouseover="swap(5)" onmouseout="restore(5)"></td>
+<td><img height="30" width="34" src="images/menu06.gif" alt=""></td></tr><tr>
+<td colspan="6"><img height="19" width="545" src="images/spacer.gif" alt=""></td></tr></table>
+<table  width="780" border="0" cellspacing="0" cellpadding="0" class="white">
+<tr align="left" valign="top"><td width="14"><img height="14" width="14" src="images/spacer.gif" alt=""></td><td width="740" class="main">
+<!-- don't edit end -->
+<!-- document start -->
+<ul>
+<li><a href="#setup">セットアップ</a></li>
+<li><a href="#usage">利用方法</a></li>
+</ul>
+
+<h2><a name="setup">セットアップ</a></h2>
+<p>
+S2Portlet を利用するためには、Seasar2と同様にJDK1.4以上が必要です。また、Seasar2 については、バージョン 2.4 以上が必要になります。
+</p>
+<p>
+S2PortletFilter は、<a href="http://portals.apache.org/bridges/multiproject/portals-bridges-portletfilter/index.html">Apache Portals Bridges</a> プロジェクトより提供されているポートレットフィルタの実装です。
+<a href="http://jcp.org/en/jsr/detail?id=168">JSR 168</a> 準拠のポートレットを利用できるポータルサーバーで利用することができます。
+</p>
+<h2><a name="usage">利用方法</a></h2>
+<p>
+ハローワールド的なポートレットの作成を通して、利用方法を見てみましょう。
+</p>
+<p>
+一般的な <a href="http://jcp.org/en/jsr/detail?id=168">JSR 168</a> 準拠のポートレットと同様に以下のファイルを作成します。
+<pre>
+WEB-INF/portlet.xml
+WEB-INF/view/helloworld.jsp (*)
+WEB-INF/web.xml (*)
+WEB-INF/jp/sf/pal/helloworld/HelloWorldPortlet.class (*)
+WEB-INF/jp/sf/pal/helloworld/HelloWorld.dicon
+WEB-INF/jp/sf/pal/helloworld/resources/HelloWorldResources.properties (*)
+WEB-INF/jp/sf/pal/helloworld/resources/HelloWorldResources_ja.properties (*)
+</pre>
+(*) のついたファイルに関しては、S2PortletFilter を使わないで作った場合と同じことを示しています。
+つまり、現在利用しているポートレットに対して、S2PortletFilter を新たに利用する場合、portlet.xml を編集して、*.dicon ファイルを追加するだけで良いということです。
+</p>
+<p>
+それでは、各ファイルについて、順番に見ていきましょう。
+</p>
+<h3><a name="portlet.xml">portlet.xml</a></h3>
+<p>
+portlet.xml は、ポートレットの配備記述子です。
+記述方法については、<a href="http://jcp.org/en/jsr/detail?id=168">JSR 168</a> を参照してください。
+portlet.xml は以下のようになります。
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;portlet-app id="s2helloworld" version="1.0"&gt;
+
+    &lt;portlet id="FilteredS2HelloWorld"&gt;
+        &lt;portlet-name&gt;FilteredS2HelloWorld&lt;/portlet-name&gt;
+        &lt;display-name&gt;Filtered Hello World for Seasar2&lt;/display-name&gt;
+        &lt;description&gt;HelloWorld is a portlet with Portlet Filter&lt;/description&gt;
+        &lt;portlet-class&gt;
+            org.apache.portals.bridges.portletfilter.FilterPortlet
+        &lt;/portlet-class&gt;
+        &lt;init-param&gt;
+            &lt;name&gt;portlet-class&lt;/name&gt;
+            &lt;value&gt;jp.sf.pal.helloworld.HelloWorldPortlet&lt;/value&gt;
+        &lt;/init-param&gt;
+        <font color="red">&lt;init-param&gt;
+            &lt;name&gt;portlet-filters&lt;/name&gt;
+            &lt;value&gt;
+                org.seasar.portlet.filter.S2PortletFilter
+            &lt;/value&gt;
+        &lt;/init-param&gt;
+        &lt;init-param&gt;
+            &lt;name&gt;
+                org.seasar.portlet.filter.S2PortletFilter:configPath
+            &lt;/name&gt;
+            &lt;value&gt;jp/sf/pal/helloworld/HelloWorld.dicon&lt;/value&gt;
+        &lt;/init-param&gt;</font>
+        &lt;expiration-cache&gt;-1&lt;/expiration-cache&gt;
+        &lt;supports&gt;
+            &lt;mime-type&gt;text/html&lt;/mime-type&gt;
+            &lt;portlet-mode&gt;VIEW&lt;/portlet-mode&gt;
+        &lt;/supports&gt;
+        &lt;supported-locale&gt;en&lt;/supported-locale&gt;
+        &lt;supported-locale&gt;ja&lt;/supported-locale&gt;
+        &lt;resource-bundle&gt;
+            jp.sf.pal.helloworld.resources.FilteredHelloWorldResources
+        &lt;/resource-bundle&gt;
+        &lt;portlet-info&gt;
+            &lt;title&gt;Hello World with S2Portlet Filter&lt;/title&gt;
+            &lt;short-title&gt;Hello&lt;/short-title&gt;
+            &lt;keywords&gt;Hello,Test&lt;/keywords&gt;
+        &lt;/portlet-info&gt;
+    &lt;/portlet&gt;
+
+&lt;/portlet-app&gt;
+</pre>
+注目するべきところを赤字で表示しています。
+</p>
+<p>
+既にご利用のポートレットに対して、S2PortletFilter を適用するためには、&lt;init-param&gt; の portlet-filters の値に org.seasar.portlet.filter.S2PortletFilter を追加します。
+<a href="http://portals.apache.org/bridges/multiproject/portals-bridges-portletfilter/index.html">Apache Portals Bridges</a> のポートレットフィルタの仕様に従い、configPath で、dicon ファイルを指定するだけです。
+</p>
+<h3><a name="HelloWorld.dicon">HelloWorld.dicon</a></h3>
+<p>
+HelloWorld.dicon は、通常の Seasar2 の設定ファイルです。
+ポートレット上で利用したいコンポーネントを記述します。
+S2GenericPortlet と異なり、portletName でポートレットクラスを定義する必要はありません。
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container//EN"
+"http://www.seasar.org/dtd/components.dtd"&gt;
+&lt;components&gt;
+
+&lt;/components&gt;
+</pre>
+</p>
+<h3><a name="helloworld.jsp">helloworld.jsp</a></h3>
+<p>
+S2PortletFilter を利用しないでポートレットを作成した場合と変更はありません。
+<pre>
+&lt;%@ taglib uri='/WEB-INF/portlet.tld' prefix='portlet'%&gt;
+&lt;%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt" %&gt;
+&lt;fmt:setBundle basename="jp.sf.pal.helloworld.resources.HelloWorldResources" /&gt;
+&lt;portlet:defineObjects/&gt;
+
+&lt;form action="&lt;portlet:actionURL /&gt;" method="POST"&gt;
+&lt;table border="0"&gt;
+    &lt;tr&gt;
+        &lt;td align="center"&gt;&lt;fmt:message key="helloworld.lable.Hello"/&gt;&lt;/td&gt;
+        &lt;td align="center"&gt;&lt;%= request.getAttribute("yourName") %&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td align="right"&gt;&lt;fmt:message key="helloworld.lable.YourName"/&gt;&lt;/td&gt;
+        &lt;td align="left"&gt;&lt;input type="text" name="yourName"/&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td align="center" colspan="2"&gt;&lt;input type="submit"
+          value="&lt;fmt:message key="helloworld.lable.Submit"/&gt;"/&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td align="left" colspan="2"&gt;&lt;%= request.getAttribute("renderTraceLog") %&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+&lt;/form&gt;
+</pre>
+</p>
+<h3><a name="web.xml">web.xml</a></h3>
+<p>
+S2PortletFilter を利用しないでポートレットを作成した場合と変更はありません。
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+                         "http://java.sun.com/dtd/web-app_2_3.dtd"&gt;
+&lt;web-app&gt;
+  &lt;display-name&gt;HelloWorld Portlet&lt;/display-name&gt;
+  &lt;description&gt;HelloWorld Portlet&lt;/description&gt;
+&lt;/web-app&gt;
+</pre>
+</p>
+<h3><a name="HelloWorldPortlet.java">HelloWorldPortlet.java</a></h3>
+<p>
+S2PortletFilter を利用しないでポートレットを作成した場合と変更はありません。
+<pre>
+package jp.sf.pal.helloworld;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.GenericPortlet;
+import javax.portlet.PortletConfig;
+import javax.portlet.PortletContext;
+import javax.portlet.PortletException;
+import javax.portlet.PortletRequestDispatcher;
+import javax.portlet.PortletSession;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+
+/**
+ * HelloWorldPortlet is a portlet to say "Hello!"
+ *
+ * @author &lt;a href="mailto:shinsuke@yahoo.co.jp"&gt;Shinsuke Sugaya&lt;/a&gt;
+ */
+public class HelloWorldPortlet extends GenericPortlet
+{
+    /**
+     * Logger for this class
+     */
+    private static final Log log = LogFactory.getLog(HelloWorldPortlet.class);
+
+    public static final String YOUR_NAME_KEY = "yourName";
+    public static final String COUNT_KEY = "count";
+
+    /* (non-Javadoc)
+     * @see javax.portlet.Portlet#init(javax.portlet.PortletConfig)
+     */
+    public void init(PortletConfig config) throws PortletException
+    {
+        super.init(config);
+    }
+
+    /* (non-Javadoc)
+     * @see javax.portlet.GenericPortlet#doView(javax.portlet.RenderRequest,
+     *        javax.portlet.RenderResponse)
+     */
+    protected void doView(RenderRequest request, RenderResponse response)
+        throws PortletException, IOException
+    {
+        response.setContentType("text/html");
+
+        PortletContext context = getPortletContext();
+
+        String yourName = request.getParameter(YOUR_NAME_KEY);
+        if (yourName == null)
+        {
+            yourName = "";
+        }
+        request.setAttribute(YOUR_NAME_KEY, yourName);
+
+        PortletRequestDispatcher rd = context.getRequestDispatcher("/WEB-INF/view/helloworld.jsp");
+        rd.include(request, response);
+    }
+
+    /* (non-Javadoc)
+     * @see javax.portlet.Portlet#processAction(javax.portlet.ActionRequest,
+     *        javax.portlet.ActionResponse)
+     */
+    public void processAction(ActionRequest request, ActionResponse response)
+        throws PortletException, IOException
+    {
+        PortletSession session = request.getPortletSession();
+        String yourName = request.getParameter(YOUR_NAME_KEY);
+
+        if (yourName != null)
+        {
+            Integer count = (Integer) session.getAttribute(COUNT_KEY);
+            if (count != null)
+            {
+                count = new Integer(count.intValue() + 1);
+            }
+            else
+            {
+                count = new Integer(1);
+            }
+
+            session.setAttribute(COUNT_KEY, count);
+            response.setRenderParameter(YOUR_NAME_KEY, yourName);
+        }
+
+        return;
+    }
+
+}
+</pre>
+</p>
+<h3><a name="HelloWorldResources.properties">HelloWorldResources.properties</a></h3>
+<p>
+S2PortletFilter を利用しないでポートレットを作成した場合と変更はありません。
+<pre>
+# helloworld.jsp
+helloworld.lable.Hello=Hello!
+helloworld.lable.YourName=Your Name:
+helloworld.lable.Submit=Submit
+</pre>
+</p>
+<h3><a name="HelloWorldResources_ja.properties">HelloWorldResources_ja.properties</a></h3>
+<p>
+S2PortletFilter を利用しないでポートレットを作成した場合と変更はありません。
+<pre>
+# portlet info
+javax.portlet.title=S2Portlet\u7528\u30cf\u30ed\u30fc\u30ef\u30fc\u30eb\u30c9
+javax.portlet.short-title=\u30cf\u30ed\u30fc
+javax.portlet.keywords=\u30c6\u30b9\u30c8,\u30cf\u30ed\u30fc
+
+# helloworld.jsp
+helloworld.lable.Hello=\u3053\u3093\u306b\u3061\u306f\u3001
+helloworld.lable.YourName=\u540d\u524d:
+helloworld.lable.Submit=\u9001\u4fe1
+</pre>
+</p>
+<h3><a name="summary">まとめ</a></h3>
+<p>
+以上のファイルを <a href="http://jcp.org/en/jsr/detail?id=168">JSR 168</a> に定義されたのパッケージ化の仕様に従い、WAR ファイルにまとめて、ポータルへ配備すれば、動作します。
+ポータルへの配備手順については、ご利用のポータルのドキュメントを参照してください。
+</p>
+<!-- document end -->
+<!-- don't edit start -->
+</td>
+<td width="14"><img height="14" width="14" src="images/spacer.gif" alt=""></td>
+</tr><tr>
+<td width="14"><img height="30" width="14" src="images/spacer.gif" alt=""></td>
+<td width="766"><img height="30" width="592" src="images/spacer.gif" alt=""></td>
+</tr><tr>
+<td width="14"><img height="14" width="14" src="images/spacer.gif" alt=""></td>
+<td width="766" class="copyright">Copyright&copy; 2004-2005, The Seasar Foundation and the others. All rights reserved.</td>
+</tr></table>
+<td class="backright" align="left" valign="top">&nbsp;</td></tr><tr>
+<td class="backunder" align="left"  valign="top" width="780" height="16">&nbsp;</td>
+<td class="backcorner" align="left" valign="top" height="16">&nbsp;</td>
+</tr></table></body>
+<!-- don't edit end -->
+</html>
