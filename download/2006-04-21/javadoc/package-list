@@ -1,0 +1,7 @@
+org.seasar.portlet
+org.seasar.portlet.container
+org.seasar.portlet.container.deployer
+org.seasar.portlet.container.impl
+org.seasar.portlet.filter
+org.seasar.portlet.hibernate3.filter
+org.seasar.portlet.util
