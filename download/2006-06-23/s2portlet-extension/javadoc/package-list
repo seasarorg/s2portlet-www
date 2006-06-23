@@ -1,0 +1,6 @@
+org.seasar.portlet.hibernate3.filter
+org.seasar.portlet.tomahawk.filter
+org.seasar.portlet.tomahawk.headerresource
+org.seasar.portlet.tomahawk.headerresource.jetspeed
+org.seasar.portlet.tomahawk.multipart
+org.seasar.portlet.wrapper
